@@ -25,8 +25,8 @@ class CurrentLocationViewController: UIViewController, CLLocationManagerDelegate
     
     private let geocoder = CLGeocoder()
     private var placemark: CLPlacemark?
-    var performingReverseGeocoding = false
-    var lastGeocodingError: Error?
+    private var performingReverseGeocoding = false
+    private var lastGeocodingError: Error?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -44,7 +44,7 @@ class CurrentLocationViewController: UIViewController, CLLocationManagerDelegate
             showLocationServicesDeniedAlert()
             return
         }
-        //10.786406, 106.636498
+        
         if updatingLocation {
             stopLocationManager()
         } else {
@@ -70,11 +70,11 @@ class CurrentLocationViewController: UIViewController, CLLocationManagerDelegate
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let newLocation = locations.last else { return }
         print("didUpdateLocations \(newLocation)")
-        
+        // Sekip if the new location is over 5 seconds late
         if newLocation.timestamp.timeIntervalSinceNow < -5 {
             return
         }
-        
+        // Check if the coordinate is valid
         if newLocation.horizontalAccuracy < 0 {
             return
         }
@@ -158,13 +158,13 @@ class CurrentLocationViewController: UIViewController, CLLocationManagerDelegate
                 self.messageLabel.text = statusMessage
             }
         }
-        configueGetMyLocationButton()
+        configureGetMyLocationButton()
     }
     
     private func startLocationManager() {
         if CLLocationManager.locationServicesEnabled() {
             locationManager.delegate = self
-            locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
+            locationManager.desiredAccuracy = kCLLocationAccuracyBest
             locationManager.startUpdatingLocation()
             updatingLocation = true
         }
@@ -178,7 +178,7 @@ class CurrentLocationViewController: UIViewController, CLLocationManagerDelegate
         }
     }
     
-    private func configueGetMyLocationButton() {
+    private func configureGetMyLocationButton() {
         if updatingLocation {
             getMyLocationButton.setTitle("Stop", for: .normal)
         } else {
